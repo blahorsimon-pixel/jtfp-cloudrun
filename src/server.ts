@@ -154,9 +154,11 @@ const h5Dir = path.join(publicDir, 'h5');
 
 // Admin 管理后台（SPA history 模式支持）
 if (fs.existsSync(adminDir)) {
+  // 支持 /admin 和 /JTFP/admin 两种路径
   app.use('/admin', express.static(adminDir, { index: 'index.html' }));
+  app.use('/JTFP/admin', express.static(adminDir, { index: 'index.html' }));
   // SPA fallback: 所有 /admin/* 非静态资源请求返回 index.html
-  app.get('/admin/*', (req, res, next) => {
+  app.get(['/admin/*', '/JTFP/admin/*'], (req, res, next) => {
     const indexPath = path.join(adminDir, 'index.html');
     if (fs.existsSync(indexPath) && !req.path.includes('.')) {
       res.sendFile(indexPath);
@@ -168,9 +170,11 @@ if (fs.existsSync(adminDir)) {
 
 // H5 商城（SPA history 模式支持）
 if (fs.existsSync(h5Dir)) {
+  // 支持 /h5 和 /JTFP/h5 两种路径
   app.use('/h5', express.static(h5Dir, { index: 'index.html' }));
+  app.use('/JTFP/h5', express.static(h5Dir, { index: 'index.html' }));
   // SPA fallback
-  app.get('/h5/*', (req, res, next) => {
+  app.get(['/h5/*', '/JTFP/h5/*'], (req, res, next) => {
     const indexPath = path.join(h5Dir, 'index.html');
     if (fs.existsSync(indexPath) && !req.path.includes('.')) {
       res.sendFile(indexPath);
