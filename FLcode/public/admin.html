@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>福利码管理后台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #5c6bc0;
+      --primary-dark: #3f51b5;
+      --primary-light: #7986cb;
+      --success: #66bb6a;
+      --danger: #ef5350;
+      --warning: #ffa726;
+      --bg-dark: #1a1a2e;
+      --bg-card: #16213e;
+      --bg-input: #0f3460;
+      --text-primary: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --border-color: #2a2a4a;
+      --border-radius: 10px;
+    }
+    
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    
+    /* 登录页面 */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+    
+    .login-card {
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+    }
+    
+    .login-card h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 30px;
+      color: var(--text-primary);
+    }
+    
+    .login-card .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .login-card label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+    
+    .login-card input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .login-card input:focus {
+      border-color: var(--primary);
+    }
+    
+    .login-card .btn {
+      width: 100%;
+      height: 48px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-family: inherit;
+    }
+    
+    .login-card .btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    .login-error {
+      color: var(--danger);
+      font-size: 14px;
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+    }
+    
+    /* 管理面板 */
+    .admin-wrapper {
+      display: none;
+    }
+    
+    .admin-wrapper.show {
+      display: block;
+    }
+    
+    .header {
+      background: var(--bg-card);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .header .btn-logout {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    .header .btn-logout:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    
+    .main-content {
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* Tab 导航 */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--bg-card);
+      padding: 8px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+    
+    .tab-btn {
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-input);
+    }
+    
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Tab 内容 */
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    /* 卡片 */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+    
+    .card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+    
+    /* 表单元素 */
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+    
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* 上传区域 */
+    .upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--primary);
+      background: rgba(92, 107, 192, 0.1);
+    }
+    
+    .upload-area .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .upload-area p {
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .upload-area .hint {
+      font-size: 13px;
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+    
+    .upload-input {
+      display: none;
+    }
+    
+    .upload-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    
+    .upload-result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .upload-result.success {
+      background: rgba(102, 187, 106, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+    
+    .upload-result.error {
+      background: rgba(239, 83, 80, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+    
+    .upload-result.show {
+      display: block;
+    }
+    
+    .upload-errors {
+      margin-top: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 13px;
+      text-align: left;
+    }
+    
+    .upload-errors li {
+      margin-bottom: 4px;
+      color: var(--danger);
+    }
+    
+    /* 数据表格 */
+    .table-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    th {
+      background: var(--bg-input);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    
+    td {
+      font-size: 14px;
+    }
+    
+    tr:hover {
+      background: rgba(92, 107, 192, 0.05);
+    }
+    
+    .code-cell {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: var(--primary-light);
+      letter-spacing: 2px;
+    }
+    
+    .note-cell {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btns button {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .pagination-info {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    .pagination-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .pagination-btns button {
+      padding: 8px 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+    
+    .pagination-btns button:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+    
+    .pagination-btns button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* 配置设置 */
+    .config-section {
+      margin-bottom: 24px;
+    }
+    
+    .config-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    /* Toast 提示 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 24px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      z-index: 1000;
+      transform: translateX(calc(100% + 20px));
+      transition: transform 0.3s ease;
+      max-width: 400px;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+    
+    .toast.success {
+      background: var(--success);
+    }
+    
+    .toast.error {
+      background: var(--danger);
+    }
+    
+    /* 模态框 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal {
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid var(--border-color);
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+    
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+    
+    .modal h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state .icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .empty-state p {
+      font-size: 15px;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 16px;
+      }
+      
+      .tabs {
+        padding: 6px;
+      }
+      
+      .tab-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+      
+      .card {
+        padding: 16px;
+      }
+      
+      th, td {
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 登录页面 -->
+  <div class="login-wrapper" id="loginWrapper">
+    <div class="login-card">
+      <h1>🔐 管理后台登录</h1>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginPassword">管理密码</label>
+          <input type="password" id="loginPassword" placeholder="请输入管理密码" required>
+        </div>
+        <button type="submit" class="btn">登 录</button>
+        <p class="login-error" id="loginError">密码错误</p>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 管理面板 -->
+  <div class="admin-wrapper" id="adminWrapper">
+    <header class="header">
+      <h1>📋 福利码管理后台</h1>
+      <button class="btn-logout" id="logoutBtn">退出登录</button>
+    </header>
+    
+    <main class="main-content">
+      <!-- Tab 导航 -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="add">单个添加</button>
+        <button class="tab-btn" data-tab="upload">批量上传</button>
+        <button class="tab-btn" data-tab="list">数据列表</button>
+        <button class="tab-btn" data-tab="config">配置管理</button>
+      </div>
+      
+      <!-- 单个添加 -->
+      <div class="tab-content active" id="tab-add">
+        <div class="card">
+          <h2>添加福利码</h2>
+          <form id="addForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="addPhone">手机号 *</label>
+                <input type="tel" id="addPhone" placeholder="13800138000" maxlength="11" required>
+              </div>
+              <div class="form-group">
+                <label for="addCode">6位数字码 *</label>
+                <input type="text" id="addCode" placeholder="123456" maxlength="6" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="addNote">备注（可选）</label>
+              <input type="text" id="addNote" placeholder="输入备注信息">
+            </div>
+            <button type="submit" class="btn btn-primary">添加</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- 批量上传 -->
+      <div class="tab-content" id="tab-upload">
+        <div class="card">
+          <h2>Excel 批量上传</h2>
+          <div class="upload-area" id="uploadArea">
+            <div class="icon">📁</div>
+            <p>点击或拖拽 Excel 文件到此处</p>
+            <p class="hint">支持 .xlsx, .xls 格式，表头需为：手机号、6位数字码、备注</p>
+            <input type="file" id="uploadInput" class="upload-input" accept=".xlsx,.xls">
+          </div>
+          <div class="upload-actions">
+            <button class="btn btn-outline" id="downloadTemplate">下载模板</button>
+            <button class="btn btn-primary" id="uploadBtn" disabled>开始上传</button>
+          </div>
+          <div class="upload-result" id="uploadResult">
+            <div id="uploadResultText"></div>
+            <ul class="upload-errors" id="uploadErrors"></ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 数据列表 -->
+      <div class="tab-content" id="tab-list">
+        <div class="card">
+          <h2>福利码列表</h2>
+          <div class="table-actions">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索手机号、码或备注...">
+            <button class="btn btn-outline" id="refreshBtn">刷新</button>
+            <button class="btn btn-danger" id="clearAllBtn">清空所有</button>
+          </div>
+          <div class="table-wrapper">
+            <table id="dataTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>手机号</th>
+                  <th>福利码</th>
+                  <th>备注</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+              </tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="icon">📭</div>
+            <p>暂无数据</p>
+          </div>
+          <div class="pagination" id="pagination">
+            <span class="pagination-info" id="paginationInfo">共 0 条</span>
+            <div class="pagination-btns">
+              <button id="prevPage" disabled>上一页</button>
+              <button id="nextPage" disabled>下一页</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 配置管理 -->
+      <div class="tab-content" id="tab-config">
+        <div class="card">
+          <h2>系统配置</h2>
+          <form id="configForm">
+            <div class="config-section">
+              <h3>页面显示</h3>
+              <div class="form-group">
+                <label for="configTitle">页面标题</label>
+                <input type="text" id="configTitle" placeholder="福利码领取">
+              </div>
+            </div>
+            
+            <div class="config-section">
+              <h3>提示语设置</h3>
+              <div class="form-group">
+                <label for="configSuccess">领取成功提示</label>
+                <textarea id="configSuccess" placeholder="恭喜您，领取成功！"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="configFail">未找到码提示</label>
+                <textarea id="configFail" placeholder="抱歉，未找到您的福利码，请确认手机号是否正确。"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="configUsage">使用说明提示</label>
+                <textarea id="configUsage" placeholder="请在有效期内使用此码，复制码到指定页面兑换即可。"></textarea>
+              </div>
+            </div>
+            
+            <div class="config-section">
+              <h3>安全设置</h3>
+              <div class="form-group">
+                <label for="configPassword">管理密码</label>
+                <input type="password" id="configPassword" placeholder="留空则不修改">
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">保存配置</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- 编辑模态框 -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>编辑福利码</h3>
+      <form id="editForm">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label for="editPhone">手机号 *</label>
+          <input type="tel" id="editPhone" maxlength="11" required>
+        </div>
+        <div class="form-group">
+          <label for="editCode">6位数字码 *</label>
+          <input type="text" id="editCode" maxlength="6" required>
+        </div>
+        <div class="form-group">
+          <label for="editNote">备注</label>
+          <input type="text" id="editNote">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="cancelEdit">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    // 支持本地直跑(/admin) 与 Nginx 子路径部署(/flcode/admin/)
+    const API_BASE = window.location.pathname.startsWith('/flcode') ? '/flcode' : '';
+    let token = localStorage.getItem('fl_admin_token') || '';
+    let currentPage = 1;
+    let totalPages = 1;
+    let searchKeyword = '';
+    let selectedFile = null;
+    
+    // DOM 元素
+    const loginWrapper = document.getElementById('loginWrapper');
+    const adminWrapper = document.getElementById('adminWrapper');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const toast = document.getElementById('toast');
+    
+    // Toast 提示
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    // API 请求封装
+    async function api(endpoint, options = {}) {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+      if (token) {
+        headers['X-Admin-Token'] = token;
+      }
+      
+      const res = await fetch(API_BASE + endpoint, {
+        ...options,
+        headers,
+      });
+      
+      const data = await res.json();
+      
+      if (res.status === 401) {
+        token = '';
+        localStorage.removeItem('fl_admin_token');
+        showLogin();
+        throw new Error('登录已过期');
+      }
+      
+      return data;
+    }
+    
+    // 显示登录页
+    function showLogin() {
+      loginWrapper.style.display = 'flex';
+      adminWrapper.classList.remove('show');
+    }
+    
+    // 显示管理面板
+    function showAdmin() {
+      loginWrapper.style.display = 'none';
+      adminWrapper.classList.add('show');
+      loadConfig();
+      loadCodes();
+    }
+    
+    // 验证 token
+    async function verifyToken() {
+      if (!token) {
+        showLogin();
+        return;
+      }
+      try {
+        const data = await api('/api/admin/verify');
+        if (data.ok) {
+          showAdmin();
+        } else {
+          showLogin();
+        }
+      } catch (e) {
+        showLogin();
+      }
+    }
+    
+    // 登录
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        const data = await api('/api/admin/login', {
+          method: 'POST',
+          body: JSON.stringify({ password }),
+        });
+        
+        if (data.ok) {
+          token = data.token;
+          localStorage.setItem('fl_admin_token', token);
+          loginError.style.display = 'none';
+          showAdmin();
+        } else {
+          loginError.textContent = data.message || '密码错误';
+          loginError.style.display = 'block';
+        }
+      } catch (e) {
+        loginError.textContent = '网络错误';
+        loginError.style.display = 'block';
+      }
+    });
+    
+    // 登出
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/logout', { method: 'POST' });
+      } catch (e) {}
+      token = '';
+      localStorage.removeItem('fl_admin_token');
+      showLogin();
+    });
+    
+    // Tab 切换
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        
+        if (tab === 'list') {
+          loadCodes();
+        } else if (tab === 'config') {
+          loadConfig();
+        }
+      });
+    });
+    
+    // 添加福利码
+    document.getElementById('addForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const phone = document.getElementById('addPhone').value.trim();
+      const code = document.getElementById('addCode').value.trim();
+      const note = document.getElementById('addNote').value.trim();
+      
+      if (!/^1[3-9]\d{9}$/.test(phone)) {
+        showToast('请输入有效的手机号', 'error');
+        return;
+      }
+      if (!/^\d{6}$/.test(code)) {
+        showToast('码必须是6位数字', 'error');
+        return;
+      }
+      
+      try {
+        const data = await api('/api/admin/codes', {
+          method: 'POST',
+          body: JSON.stringify({ phone, code, note }),
+        });
+        
+        if (data.ok) {
+          showToast('添加成功');
+          document.getElementById('addForm').reset();
+        } else {
+          showToast(data.message || '添加失败', 'error');
+        }
+      } catch (e) {
+        showToast('操作失败', 'error');
+      }
+    });
+    
+    // 文件上传
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadInput = document.getElementById('uploadInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadResult = document.getElementById('uploadResult');
+    const uploadResultText = document.getElementById('uploadResultText');
+    const uploadErrors = document.getElementById('uploadErrors');
+    
+    uploadArea.addEventListener('click', () => uploadInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFileSelect(file);
+    });
+    
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFileSelect(file);
+    });
+    
+    function handleFileSelect(file) {
+      if (!file.name.match(/\.(xlsx|xls)$/i)) {
+        showToast('请选择 Excel 文件', 'error');
+        return;
+      }
+      selectedFile = file;
+      uploadArea.querySelector('p').textContent = `已选择: ${file.name}`;
+      uploadBtn.disabled = false;
+      uploadResult.classList.remove('show');
+    }
+    
+    uploadBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+      
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = '上传中...';
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        
+        const res = await fetch(API_BASE + '/api/admin/upload', {
+          method: 'POST',
+          headers: { 'X-Admin-Token': token },
+          body: formData,
+        });
+        
+        const data = await res.json();
+        
+        uploadResult.className = `upload-result show ${data.ok ? 'success' : 'error'}`;
+        uploadResultText.textContent = data.message;
+        
+        if (data.errors && data.errors.length > 0) {
+          uploadErrors.innerHTML = data.errors.map(e => `<li>${e}</li>`).join('');
+        } else {
+          uploadErrors.innerHTML = '';
+        }
+        
+        if (data.ok) {
+          selectedFile = null;
+          uploadArea.querySelector('p').textContent = '点击或拖拽 Excel 文件到此处';
+          uploadInput.value = '';
+        }
+      } catch (e) {
+        uploadResult.className = 'upload-result show error';
+        uploadResultText.textContent = '上传失败';
+      } finally {
+        uploadBtn.disabled = !selectedFile;
+        uploadBtn.textContent = '开始上传';
+      }
+    });
+    
+    // 下载模板
+    document.getElementById('downloadTemplate').addEventListener('click', () => {
+      window.location.href = API_BASE + '/api/admin/template';
+    });
+    
+    // 数据列表
+    const tableBody = document.getElementById('tableBody');
+    const emptyState = document.getElementById('emptyState');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+    const searchInput = document.getElementById('searchInput');
+    
+    async function loadCodes() {
+      try {
+        const params = new URLSearchParams({
+          page: currentPage,
+          pageSize: 20,
+        });
+        if (searchKeyword) {
+          params.append('keyword', searchKeyword);
+        }
+        
+        const data = await api(`/api/admin/codes?${params}`);
+        
+        if (data.ok) {
+          renderTable(data.data);
+          totalPages = data.pagination.totalPages;
+          paginationInfo.textContent = `共 ${data.pagination.total} 条，第 ${currentPage}/${totalPages || 1} 页`;
+          prevPage.disabled = currentPage <= 1;
+          nextPage.disabled = currentPage >= totalPages;
+          
+          emptyState.style.display = data.data.length === 0 ? 'block' : 'none';
+          document.getElementById('dataTable').style.display = data.data.length === 0 ? 'none' : 'table';
+        }
+      } catch (e) {
+        showToast('加载数据失败', 'error');
+      }
+    }
+    
+    function renderTable(codes) {
+      tableBody.innerHTML = codes.map(item => `
+        <tr data-id="${item.id}">
+          <td>${item.id}</td>
+          <td>${item.phone}</td>
+          <td class="code-cell">${item.code}</td>
+          <td class="note-cell" title="${item.note || ''}">${item.note || '-'}</td>
+          <td>${formatDate(item.created_at)}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-outline edit-btn" data-id="${item.id}">编辑</button>
+              <button class="btn btn-danger delete-btn" data-id="${item.id}">删除</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      
+      // 绑定编辑按钮
+      tableBody.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+      });
+      
+      // 绑定删除按钮
+      tableBody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteCode(btn.dataset.id));
+      });
+    }
+    
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+    
+    prevPage.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        loadCodes();
+      }
+    });
+    
+    nextPage.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        loadCodes();
+      }
+    });
+    
+    let searchTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchKeyword = searchInput.value.trim();
+        currentPage = 1;
+        loadCodes();
+      }, 300);
+    });
+    
+    document.getElementById('refreshBtn').addEventListener('click', loadCodes);
+    
+    document.getElementById('clearAllBtn').addEventListener('click', async () => {
+      if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) return;
+      
+      try {
+        const data = await api('/api/admin/codes', { method: 'DELETE' });
+        if (data.ok) {
+          showToast('已清空所有数据');
+          loadCodes();
+        } else {
+          showToast(data.message || '操作失败', 'error');
+        }
+      } catch (e) {
+        showToast('操作失败', 'error');
+      }
+    });
+    
+    // 编辑模态框
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    
+    function openEditModal(id) {
+      const row = tableBody.querySelector(`tr[data-id="${id}"]`);
+      if (!row) return;
+      
+      document.getElementById('editId').value = id;
+      document.getElementById('editPhone').value = row.cells[1].textContent;
+      document.getElementById('editCode').value = row.cells[2].textContent;
+      document.getElementById('editNote').value = row.cells[3].textContent === '-' ? '' : row.cells[3].title;
+      
+      editModal.classList.add('show');
+    }
+    
+    document.getElementById('cancelEdit').addEventListener('click', () => {
+      editModal.classList.remove('show');
+    });
+    
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) {
+        editModal.classList.remove('show');
+      }
+    });
+    
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('editId').value;
+      const phone = document.getElementById('editPhone').value.trim();
+      const code = document.getElementById('editCode').value.trim();
+      const note = document.getElementById('editNote').value.trim();
+      
+      if (!/^1[3-9]\d{9}$/.test(phone)) {
+        showToast('请输入有效的手机号', 'error');
+        return;
+      }
+      if (!/^\d{6}$/.test(code)) {
+        showToast('码必须是6位数字', 'error');
+        return;
+      }
+      
+      try {
+        const data = await api(`/api/admin/codes/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ phone, code, note }),
+        });
+        
+        if (data.ok) {
+          showToast('更新成功');
+          editModal.classList.remove('show');
+          loadCodes();
+        } else {
+          showToast(data.message || '更新失败', 'error');
+        }
+      } catch (e) {
+        showToast('操作失败', 'error');
+      }
+    });
+    
+    async function deleteCode(id) {
+      if (!confirm('确定要删除这条记录吗？')) return;
+      
+      try {
+        const data = await api(`/api/admin/codes/${id}`, { method: 'DELETE' });
+        if (data.ok) {
+          showToast('删除成功');
+          loadCodes();
+        } else {
+          showToast(data.message || '删除失败', 'error');
+        }
+      } catch (e) {
+        showToast('操作失败', 'error');
+      }
+    }
+    
+    // 配置管理
+    async function loadConfig() {
+      try {
+        const data = await api('/api/admin/config');
+        if (data.ok) {
+          document.getElementById('configTitle').value = data.data.page_title || '';
+          document.getElementById('configSuccess').value = data.data.success_msg || '';
+          document.getElementById('configFail').value = data.data.fail_msg || '';
+          document.getElementById('configUsage').value = data.data.usage_tip || '';
+        }
+      } catch (e) {
+        console.error('Failed to load config:', e);
+      }
+    }
+    
+    document.getElementById('configForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const configs = {
+        page_title: document.getElementById('configTitle').value.trim(),
+        success_msg: document.getElementById('configSuccess').value.trim(),
+        fail_msg: document.getElementById('configFail').value.trim(),
+        usage_tip: document.getElementById('configUsage').value.trim(),
+      };
+      
+      const newPassword = document.getElementById('configPassword').value;
+      if (newPassword) {
+        configs.admin_password = newPassword;
+      }
+      
+      try {
+        const data = await api('/api/admin/config', {
+          method: 'POST',
+          body: JSON.stringify(configs),
+        });
+        
+        if (data.ok) {
+          showToast('配置已保存');
+          document.getElementById('configPassword').value = '';
+        } else {
+          showToast(data.message || '保存失败', 'error');
+        }
+      } catch (e) {
+        showToast('操作失败', 'error');
+      }
+    });
+    
+    // 初始化
+    verifyToken();
+  </script>
+</body>
+</html>
+

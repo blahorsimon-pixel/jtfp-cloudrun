@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="error" wx:elif="{{error}}">
+    <text>{{error}}</text>
+    <button class="btn-retry" bindtap="loadDetail">重试</button>
+  </view>
+
+  <view wx:else>
+    <view class="card">
+      <view class="row">
+        <text class="label">订单号</text>
+        <text class="value">{{order.order_no}}</text>
+      </view>
+      <view class="row">
+        <text class="label">状态</text>
+        <text class="value status">{{order.status}}</text>
+      </view>
+      <view class="row">
+        <text class="label">金额</text>
+        <text class="value price">¥{{(order.total_amount || 0) / 100}}</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{address}}">
+      <text class="section-title">收货地址</text>
+      <text class="addr-line">{{address.name}} {{address.phone}}</text>
+      <text class="addr-line">{{address.region}} {{address.detail}}</text>
+    </view>
+
+    <view class="card">
+      <text class="section-title">商品清单</text>
+      <view class="item" wx:for="{{items}}" wx:key="id">
+        <image class="cover" src="{{item.cover_url}}" mode="aspectFill" />
+        <view class="info">
+          <text class="title">{{item.sku_title}}</text>
+          <view class="meta">
+            <text class="qty">x{{item.quantity}}</text>
+            <text class="price">¥{{(item.sale_price || 0) / 100}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="footer" wx:if="{{order.status == 'PENDING_PAYMENT'}}">
+      <view class="footer-left">
+        <text class="total-label">应付</text>
+        <text class="total-value">¥{{(order.total_amount || 0) / 100}}</text>
+      </view>
+      <button class="btn-pay" bindtap="payNow">去支付</button>
+    </view>
+  </view>
+
+  <!-- 客服悬浮按钮 -->
+  <kefu-float></kefu-float>
+</view>

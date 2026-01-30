@@ -1,0 +1,165 @@
+/* 首页样式 - 简洁清爽 */
+.container {
+  padding: 20rpx;
+  padding-bottom: 140rpx;
+  min-height: 100vh;
+  background: #f7f8fa;
+}
+
+/* 搜索栏 */
+.search-bar {
+  margin-bottom: 24rpx;
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 40rpx;
+  padding: 18rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+
+.search-icon {
+  margin-right: 14rpx;
+  font-size: 28rpx;
+}
+
+.search-placeholder {
+  color: #bbb;
+  font-size: 28rpx;
+}
+
+/* 商品网格 */
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.product-card {
+  width: 48.5%;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.product-card:active {
+  opacity: 0.9;
+}
+
+.product-image {
+  width: 100%;
+  height: 340rpx;
+}
+
+.product-info {
+  padding: 16rpx 20rpx 20rpx;
+}
+
+.product-title {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.4;
+  height: 78rpx;
+  font-weight: 500;
+}
+
+.product-price {
+  margin-top: 12rpx;
+  color: #ff6b35;
+}
+
+.price-symbol {
+  font-size: 24rpx;
+}
+
+.price-value {
+  font-size: 38rpx;
+  font-weight: 700;
+}
+
+/* 加载动画 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  gap: 12rpx;
+}
+
+.loading-dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: #ff6b35;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 错误状态 */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.error-text {
+  color: #999;
+  font-size: 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.btn-retry {
+  font-size: 28rpx;
+  padding: 14rpx 48rpx;
+  background: #ff6b35;
+  color: #fff;
+  border-radius: 40rpx;
+  border: none;
+}
+
+.btn-retry::after {
+  border: none;
+}
+
+/* 空状态 */
+.empty-state {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+/* 文字省略 */
+.ellipsis-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}

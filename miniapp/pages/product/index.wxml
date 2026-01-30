@@ -1,0 +1,100 @@
+<view class="container">
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="error" wx:elif="{{error}}">
+    <text>{{error}}</text>
+    <button class="btn-retry" bindtap="loadDetail">重试</button>
+  </view>
+
+  <view wx:else>
+    <image class="cover" src="{{product.cover_url}}" mode="aspectFill" />
+
+    <view class="card">
+      <text class="title">{{product.title}}</text>
+      <view class="row price-row">
+        <text class="price-symbol">¥</text>
+        <text class="price-value">{{displayPriceCent / 100}}</text>
+        <text class="tag tag-welfare" wx:if="{{product.is_welfare == 1}}">福利</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{skus.length > 0 && product.is_welfare != 1}}">
+      <text class="section-title">选择规格</text>
+      <view class="sku-list">
+        <view
+          class="sku-item {{selectedSkuId == item.id ? 'active' : ''}}"
+          wx:for="{{skus}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="selectSku"
+        >
+          <text class="sku-text">{{item.sku_title}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 福利码输入区域（仅福利商品显示） -->
+    <view class="card welfare-section" wx:if="{{product.is_welfare == 1}}">
+      <text class="section-title welfare-title">福利码</text>
+      <input
+        class="welfare-input"
+        type="number"
+        maxlength="6"
+        placeholder="请输入6位纯数字福利码"
+        value="{{welfareCode}}"
+        bindinput="onWelfareCodeInput"
+      />
+      <!-- 验证结果 -->
+      <view class="welfare-result" wx:if="{{welfareChecked}}">
+        <!-- 验证成功 -->
+        <view class="welfare-ok-box" wx:if="{{welfareValid}}">
+          <text class="welfare-price">匹配金额：¥{{welfarePriceCent / 100}}</text>
+          <view class="welfare-usage-hint" wx:if="{{welfareMaxUsage > 1}}">
+            <text class="fire-icon">🔥</text>
+            <text>该福利码可使用 {{welfareMaxUsage}} 次，剩余 {{welfareRemainingUsage}} 次</text>
+          </view>
+          <view class="welfare-note-box" wx:if="{{welfareNote}}">
+            <text class="note-label">备注：</text>
+            <text>{{welfareNote}}</text>
+          </view>
+        </view>
+        <!-- 验证失败 -->
+        <view class="welfare-bad-box" wx:else>
+          <text class="warning-icon">⚠️</text>
+          <text>{{welfareError}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{product.is_welfare != 1}}">
+      <text class="section-title">数量</text>
+      <view class="qty">
+        <button class="qty-btn" bindtap="decQty">-</button>
+        <text class="qty-value">{{qty}}</text>
+        <button class="qty-btn" bindtap="incQty">+</button>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{product.description}}">
+      <text class="section-title">商品说明</text>
+      <view class="desc">
+        <rich-text nodes="{{descNodes}}" />
+      </view>
+    </view>
+
+    <view class="footer">
+      <button class="btn btn-ghost" bindtap="goCart">购物车</button>
+      <button class="btn btn-primary" bindtap="addToCart" wx:if="{{product.is_welfare != 1}}">加入购物车</button>
+      <button 
+        class="btn btn-buy {{product.is_welfare == 1 && !welfareValid ? 'btn-disabled' : ''}}" 
+        bindtap="buyNow"
+        disabled="{{product.is_welfare == 1 && !welfareValid}}"
+      >立即购买</button>
+    </view>
+  </view>
+
+  <!-- 客服悬浮按钮 -->
+  <kefu-float></kefu-float>
+</view>

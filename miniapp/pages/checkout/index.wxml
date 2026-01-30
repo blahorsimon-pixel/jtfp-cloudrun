@@ -1,0 +1,71 @@
+<view class="container">
+  <view class="address card" bindtap="goEditAddress">
+    <view wx:if="{{address}}">
+      <view class="addr-top">
+        <text class="addr-name">{{address.name}}</text>
+        <text class="addr-phone">{{address.phone}}</text>
+      </view>
+      <text class="addr-line">{{address.region}} {{address.detail}}</text>
+      <text class="addr-edit">点击修改</text>
+    </view>
+    <view wx:else class="addr-empty">
+      <text class="addr-empty-title">请填写收货地址</text>
+      <text class="addr-edit">点击填写</text>
+    </view>
+  </view>
+
+  <!-- 福利码订单提示 -->
+  <view class="card welfare-info-card" wx:if="{{isWelfareOrder}}">
+    <view class="welfare-tag-row">
+      <text class="welfare-code-tag">福利码 {{welfareInviteCode}}</text>
+    </view>
+    <view class="welfare-note-row" wx:if="{{welfareNote}}">
+      <text class="welfare-note-label">备注：</text>
+      <text class="welfare-note-text">{{welfareNote}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <text class="section-title">商品清单</text>
+    <view class="item" wx:for="{{items}}" wx:key="key">
+      <image class="cover" src="{{item.cover_url}}" mode="aspectFill" />
+      <view class="info">
+        <text class="title">{{item.title}}</text>
+        <text class="sku" wx:if="{{item.skuTitle}}">{{item.skuTitle}}</text>
+        <text class="sku" wx:elif="{{item.is_welfare == 1}}">福利商品</text>
+        <view class="meta">
+          <text class="price">¥{{item.price_cent / 100}}</text>
+          <text class="qty">x{{item.qty}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="sum-row">
+      <text class="sum-label">商品金额</text>
+      <text class="sum-value">¥{{goodsCent / 100}}</text>
+    </view>
+    <view class="sum-row hint" wx:if="{{!isWelfareOrder}}">
+      <text class="sum-label">运费</text>
+      <text class="sum-value">下单后计算</text>
+    </view>
+    <view class="sum-row hint" wx:if="{{isWelfareOrder}}">
+      <text class="sum-label">运费</text>
+      <text class="sum-value">福利订单免运费</text>
+    </view>
+  </view>
+
+  <view class="footer">
+    <view class="footer-left">
+      <text class="total-label">合计</text>
+      <text class="total-value">¥{{goodsCent / 100}}</text>
+    </view>
+    <button class="btn-submit" bindtap="submitOrder" loading="{{submitting}}" disabled="{{submitting}}">
+      提交订单并支付
+    </button>
+  </view>
+
+  <!-- 客服悬浮按钮 -->
+  <kefu-float></kefu-float>
+</view>

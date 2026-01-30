@@ -1,0 +1,43 @@
+<view class="container">
+  <view class="card">
+    <button class="btn-wx-address" bindtap="chooseWxAddress">
+      <text class="btn-wx-text">📍 获取微信地址</text>
+    </button>
+  </view>
+
+  <view class="card">
+    <text class="label">收货人</text>
+    <input class="input" placeholder="姓名" value="{{form.name}}" data-field="name" bindinput="onInput" />
+  </view>
+
+  <view class="card">
+    <text class="label">手机号</text>
+    <input class="input" placeholder="手机号" value="{{form.phone}}" data-field="phone" bindinput="onInput" />
+  </view>
+
+  <view class="card">
+    <text class="label">省/市/区</text>
+    <picker mode="region" bindchange="onRegionChange" value="{{regionValue}}">
+      <view class="picker-view">
+        <text class="picker-text {{regionText ? '' : 'picker-placeholder'}}">{{regionText || '请选择省/市/区'}}</text>
+        <text class="picker-arrow">></text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="card">
+    <text class="label">详细地址</text>
+    <textarea
+      class="textarea"
+      placeholder="街道/门牌号等"
+      value="{{form.detail}}"
+      data-field="detail"
+      bindinput="onInput"
+    />
+  </view>
+
+  <view class="footer">
+    <button class="btn btn-ghost" bindtap="clear">清空</button>
+    <button class="btn btn-primary" bindtap="save">保存地址</button>
+  </view>
+</view>

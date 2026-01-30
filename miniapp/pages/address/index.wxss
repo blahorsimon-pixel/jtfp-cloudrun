@@ -1,0 +1,106 @@
+.container {
+  padding: 20rpx 20rpx 140rpx;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.label {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.input {
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 18rpx 16rpx;
+  font-size: 28rpx;
+  color: #222;
+}
+
+.textarea {
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 18rpx 16rpx;
+  font-size: 28rpx;
+  color: #222;
+  min-height: 140rpx;
+}
+
+/* 省市区 picker 样式 */
+.picker-view {
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 18rpx 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picker-text {
+  font-size: 28rpx;
+  color: #222;
+}
+
+.picker-placeholder {
+  color: #999;
+}
+
+.picker-arrow {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 获取微信地址按钮 */
+.btn-wx-address {
+  width: 100%;
+  background: linear-gradient(135deg, #07c160 0%, #05a650 100%);
+  border: none;
+  border-radius: 12rpx;
+  padding: 24rpx 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-wx-text {
+  font-size: 30rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  padding: 18rpx 20rpx;
+  display: flex;
+  gap: 12rpx;
+  box-shadow: 0 -6rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.btn {
+  flex: 1;
+  font-size: 28rpx;
+  border-radius: 14rpx;
+  padding: 18rpx 0;
+}
+
+.btn-ghost {
+  background: #f6f6f6;
+  color: #333;
+}
+
+.btn-primary {
+  background: #ff6b35;
+  color: #fff;
+}

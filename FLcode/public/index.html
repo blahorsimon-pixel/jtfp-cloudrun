@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <title>福利码领取</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #ff6b6b;
+      --primary-dark: #ee5a5a;
+      --primary-light: #ff8787;
+      --success: #51cf66;
+      --warning: #fcc419;
+      --bg-gradient-start: #667eea;
+      --bg-gradient-end: #764ba2;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text-primary: #2d3436;
+      --text-secondary: #636e72;
+      --border-radius: 16px;
+    }
+    
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* 装饰性背景元素 */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    body::after {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      bottom: -50px;
+      left: -50px;
+      animation: float 8s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 40px 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+    
+    .header .icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+    }
+    
+    .header .icon svg {
+      width: 36px;
+      height: 36px;
+      fill: white;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    .input-wrapper .prefix {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .input-wrapper input {
+      width: 100%;
+      height: 54px;
+      padding: 0 16px 0 58px;
+      font-size: 17px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      letter-spacing: 1px;
+    }
+    
+    .input-wrapper input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+    }
+    
+    .input-wrapper input::placeholder {
+      color: #adb5bd;
+      letter-spacing: 0;
+    }
+    
+    .btn {
+      width: 100%;
+      height: 54px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn .loading {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    .btn.is-loading .text {
+      display: none;
+    }
+    
+    .btn.is-loading .loading {
+      display: inline-block;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 结果展示 */
+    .result {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .result.show {
+      display: block;
+    }
+    
+    .result-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    
+    .result-icon.success {
+      background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+      box-shadow: 0 10px 30px rgba(81, 207, 102, 0.4);
+    }
+    
+    .result-icon.fail {
+      background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);
+      box-shadow: 0 10px 30px rgba(134, 142, 150, 0.4);
+    }
+    
+    .result-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+    
+    .result h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    
+    .result .message {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    
+    .code-display {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .code-display .label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .code-display .code {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 6px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .code-note {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    
+    .code-note .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #856404;
+      margin-bottom: 4px;
+    }
+    
+    .code-note .content {
+      font-size: 14px;
+      color: #856404;
+      line-height: 1.5;
+    }
+    
+    .usage-tip {
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    
+    .usage-tip .title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1565c0;
+      margin-bottom: 4px;
+    }
+    
+    .usage-tip .content {
+      font-size: 14px;
+      color: #1565c0;
+      line-height: 1.5;
+    }
+    
+    .btn-copy {
+      width: 100%;
+      height: 48px;
+      background: white;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+    
+    .btn-copy:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-copy.copied {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    
+    .btn-back {
+      width: 100%;
+      height: 48px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color 0.3s ease;
+    }
+    
+    .btn-back:hover {
+      color: var(--text-primary);
+    }
+    
+    /* 隐藏表单 */
+    .form-section.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <!-- 表单区域 -->
+      <div class="form-section" id="formSection">
+        <div class="header">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+            </svg>
+          </div>
+          <h1 id="pageTitle">福利码领取</h1>
+          <p>输入您的手机号，领取专属福利码</p>
+        </div>
+        
+        <form id="claimForm">
+          <div class="form-group">
+            <label for="phone">手机号码</label>
+            <div class="input-wrapper">
+              <span class="prefix">+86</span>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone" 
+                placeholder="请输入手机号" 
+                maxlength="11"
+                pattern="[0-9]*"
+                inputmode="numeric"
+                autocomplete="tel"
+                required
+              >
+            </div>
+          </div>
+          
+          <button type="submit" class="btn" id="submitBtn">
+            <span class="text">立即领取</span>
+            <span class="loading"></span>
+          </button>
+        </form>
+      </div>
+      
+      <!-- 结果区域 -->
+      <div class="result" id="resultSection">
+        <!-- 成功结果 -->
+        <div id="successResult" style="display: none;">
+          <div class="result-icon success">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
+          <h2 id="successMsg">恭喜您，领取成功！</h2>
+          <p class="message" id="successSubMsg">您的专属福利码如下</p>
+          
+          <div class="code-display">
+            <div class="label">您的福利码</div>
+            <div class="code" id="codeValue">------</div>
+          </div>
+          
+          <div class="code-note" id="codeNoteSection" style="display: none;">
+            <div class="title">备注说明</div>
+            <div class="content" id="codeNote"></div>
+          </div>
+          
+          <div class="usage-tip" id="usageTipSection">
+            <div class="title">使用说明</div>
+            <div class="content" id="usageTip">请在有效期内使用此码。</div>
+          </div>
+          
+          <button type="button" class="btn-copy" id="copyBtn">复制福利码</button>
+        </div>
+        
+        <!-- 失败结果 -->
+        <div id="failResult" style="display: none;">
+          <div class="result-icon fail">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+          </div>
+          <h2>未找到福利码</h2>
+          <p class="message" id="failMsg">抱歉，未找到您的福利码，请确认手机号是否正确。</p>
+        </div>
+        
+        <button type="button" class="btn-back" id="backBtn">← 返回重新查询</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 支持本地直跑(/) 与 Nginx 子路径部署(/flcode)
+    const API_BASE = window.location.pathname.startsWith('/flcode') ? '/flcode' : '';
+    
+    // DOM 元素
+    const formSection = document.getElementById('formSection');
+    const resultSection = document.getElementById('resultSection');
+    const claimForm = document.getElementById('claimForm');
+    const phoneInput = document.getElementById('phone');
+    const submitBtn = document.getElementById('submitBtn');
+    const successResult = document.getElementById('successResult');
+    const failResult = document.getElementById('failResult');
+    const codeValue = document.getElementById('codeValue');
+    const codeNote = document.getElementById('codeNote');
+    const codeNoteSection = document.getElementById('codeNoteSection');
+    const usageTip = document.getElementById('usageTip');
+    const usageTipSection = document.getElementById('usageTipSection');
+    const successMsg = document.getElementById('successMsg');
+    const failMsg = document.getElementById('failMsg');
+    const copyBtn = document.getElementById('copyBtn');
+    const backBtn = document.getElementById('backBtn');
+    const pageTitle = document.getElementById('pageTitle');
+    
+    // 加载页面配置
+    async function loadConfig() {
+      try {
+        const res = await fetch(API_BASE + '/api/config');
+        const data = await res.json();
+        if (data.ok && data.data) {
+          if (data.data.page_title) {
+            pageTitle.textContent = data.data.page_title;
+            document.title = data.data.page_title;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load config:', e);
+      }
+    }
+    
+    // 验证手机号
+    function validatePhone(phone) {
+      return /^1[3-9]\d{9}$/.test(phone);
+    }
+    
+    // 显示结果
+    function showResult(success, data) {
+      formSection.classList.add('hidden');
+      resultSection.classList.add('show');
+      
+      if (success) {
+        successResult.style.display = 'block';
+        failResult.style.display = 'none';
+        codeValue.textContent = data.code;
+        
+        if (data.message) {
+          successMsg.textContent = data.message;
+        }
+        
+        if (data.note) {
+          codeNote.textContent = data.note;
+          codeNoteSection.style.display = 'block';
+        } else {
+          codeNoteSection.style.display = 'none';
+        }
+        
+        if (data.usage_tip) {
+          usageTip.textContent = data.usage_tip;
+          usageTipSection.style.display = 'block';
+        }
+      } else {
+        successResult.style.display = 'none';
+        failResult.style.display = 'block';
+        if (data.message) {
+          failMsg.textContent = data.message;
+        }
+      }
+    }
+    
+    // 返回表单
+    function showForm() {
+      formSection.classList.remove('hidden');
+      resultSection.classList.remove('show');
+      successResult.style.display = 'none';
+      failResult.style.display = 'none';
+      phoneInput.value = '';
+      phoneInput.focus();
+    }
+    
+    // 复制福利码
+    async function copyCode() {
+      const code = codeValue.textContent;
+      try {
+        await navigator.clipboard.writeText(code);
+        copyBtn.textContent = '已复制';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = '复制福利码';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      } catch (e) {
+        // 降级方案
+        const input = document.createElement('input');
+        input.value = code;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        copyBtn.textContent = '已复制';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = '复制福利码';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }
+    }
+    
+    // 表单提交
+    async function handleSubmit(e) {
+      e.preventDefault();
+      
+      const phone = phoneInput.value.trim();
+      
+      if (!validatePhone(phone)) {
+        alert('请输入有效的中国大陆手机号');
+        phoneInput.focus();
+        return;
+      }
+      
+      submitBtn.classList.add('is-loading');
+      submitBtn.disabled = true;
+      
+      try {
+        const res = await fetch(API_BASE + '/api/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone }),
+        });
+        
+        const data = await res.json();
+        
+        if (data.ok && data.found) {
+          showResult(true, data);
+        } else {
+          showResult(false, data);
+        }
+      } catch (e) {
+        console.error('Request failed:', e);
+        alert('网络错误，请稍后重试');
+      } finally {
+        submitBtn.classList.remove('is-loading');
+        submitBtn.disabled = false;
+      }
+    }
+    
+    // 事件监听
+    claimForm.addEventListener('submit', handleSubmit);
+    copyBtn.addEventListener('click', copyCode);
+    backBtn.addEventListener('click', showForm);
+    
+    // 只允许输入数字
+    phoneInput.addEventListener('input', function(e) {
+      this.value = this.value.replace(/\D/g, '');
+    });
+    
+    // 页面加载时获取配置
+    loadConfig();
+  </script>
+</body>
+</html>
+

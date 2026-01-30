@@ -1,0 +1,117 @@
+/* 金泰资产品牌周大福红金主题 - 极致轻奢风格 */
+:root {
+  /* 周大福核心色值 */
+  --jintai-red-primary: #A6192E; /* 周大福经典红 */
+  --jintai-red-dark: #8B1527;
+  --jintai-red-light: #C42847;
+  
+  --jintai-gold-primary: #D4AF37; /* 经典黄金色 */
+  --jintai-gold-rich: #FFD700;    /* 亮金 */
+  --jintai-gold-deep: #B8860B;    /* 古法金 */
+  --jintai-gold-champagne: #F7E7CE; /* 香槟金 */
+  
+  --jintai-text: #1A1A1A;
+  --jintai-text-secondary: #5C4B2C; /* 带有金棕调的文字 */
+  --jintai-text-light: #8C8C8C;
+  
+  --jintai-bg: #FBF8F1; /* 暖米色背景 */
+  --jintai-bg-secondary: #F5EFE7;
+  --jintai-border: #E8DCC8;
+
+  /* 渐变升级 - 增加金属质感 */
+  --jintai-gold-gradient: linear-gradient(135deg, #FFD700 0%, #F5E8C7 30%, #D4AF37 50%, #B8860B 80%, #D4AF37 100%);
+  --jintai-red-gradient: linear-gradient(135deg, #C42847 0%, #A6192E 50%, #8B1527 100%);
+  --jintai-dark-gradient: linear-gradient(135deg, #2C2C2C 0%, #1A1A1A 100%);
+  
+  /* 奢华投影 */
+  --jintai-luxury-shadow: 0 12px 40px rgba(166, 25, 46, 0.15);
+  --jintai-gold-shadow: 0 8px 32px rgba(212, 175, 55, 0.25);
+  
+  --jintai-radius-sm: 4px; /* 更加硬朗的边缘感，符合珠宝精致感 */
+  --jintai-radius-md: 12px;
+  --jintai-radius-lg: 24px;
+}
+
+/* 覆盖 Vant 主题色 - 极致红金 */
+:root:root {
+  --van-primary-color: var(--jintai-red-primary);
+  --van-button-primary-background: var(--jintai-red-gradient);
+  --van-button-primary-border-color: transparent;
+  --van-button-primary-color: white; /* 确保红色背景按钮文字是白色 */
+  --van-tabs-bottom-bar-color: var(--jintai-gold-primary);
+  --van-tab-active-text-color: var(--jintai-red-primary);
+  --van-nav-bar-icon-color: var(--jintai-red-primary);
+  --van-nav-bar-text-color: var(--jintai-red-primary);
+  --van-tag-primary-color: var(--jintai-red-primary);
+  --van-search-content-background: #fff;
+}
+
+/* 强制所有 primary 按钮文字为白色 */
+.van-button--primary {
+  color: white !important;
+}
+
+/* 奢华字体与文本 */
+.luxury-title {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
+  letter-spacing: 0.05em;
+  color: var(--jintai-red-primary);
+  font-weight: 600;
+}
+
+.gold-text {
+  background: var(--jintai-gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+/* 奢华按钮 */
+.jintai-btn:not(.van-button--primary) {
+  background: var(--jintai-gold-gradient);
+  border: none;
+  color: #3D2B00 !important; /* 金色按钮配深色文字更有质感 */
+  font-weight: 600;
+  box-shadow: var(--jintai-gold-shadow);
+  transition: all 0.3s ease;
+}
+
+/* 当 jintai-btn 应用在 primary 按钮上时，使用白色文字和红色背景 */
+.jintai-btn.van-button--primary,
+.van-button--primary.jintai-btn {
+  color: white !important;
+  background: var(--jintai-red-gradient) !important;
+  box-shadow: var(--jintai-luxury-shadow);
+  transition: all 0.3s ease;
+}
+
+.ctf-red-btn {
+  background: var(--jintai-red-gradient);
+  border: none;
+  color: white !important;
+  font-weight: 600;
+  box-shadow: var(--jintai-luxury-shadow);
+}
+
+/* 装饰性元素 */
+.luxury-border {
+  border: 1px solid transparent;
+  background-image: linear-gradient(white, white), var(--jintai-gold-gradient);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+}
+
+/* 徽章标签 - 红底白字 */
+.jintai-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--jintai-red-gradient);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(166, 25, 46, 0.25);
+  letter-spacing: 0.5px;
+}
+

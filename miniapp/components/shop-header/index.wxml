@@ -1,0 +1,23 @@
+<!--店铺页眉组件 - 简洁版-->
+<view class="shop-header">
+  <view class="header-inner">
+    <!-- 左侧吉祥物 Logo -->
+    <view class="logo-box">
+      <image 
+        class="logo-img" 
+        src="{{logoUrl}}" 
+        mode="aspectFit"
+        binderror="onLogoError"
+      />
+    </view>
+    
+    <!-- 右侧店铺信息 -->
+    <view class="shop-info">
+      <text class="shop-name">携荷管家</text>
+      <view class="shop-sub">
+        <view class="dot"></view>
+        <text class="shop-desc">商家自营店</text>
+      </view>
+    </view>
+  </view>
+</view>

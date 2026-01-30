@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="card user-card">
+    <view class="row">
+      <view class="avatar">
+        <text class="avatar-text">{{avatarText}}</text>
+      </view>
+      <view class="user-info">
+        <text class="user-name">{{displayName}}</text>
+        <text class="user-sub" wx:if="{{user && user.phone}}">手机号：{{user.phone}}</text>
+        <text class="user-sub" wx:elif="{{loading}}">加载中...</text>
+        <text class="user-sub" wx:else>小程序静默登录</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="cell" bindtap="goOrders">
+      <text class="cell-title">我的订单</text>
+      <text class="cell-arrow">></text>
+    </view>
+    <view class="cell" bindtap="goAddress">
+      <text class="cell-title">收货地址</text>
+      <text class="cell-arrow">></text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="cell" bindtap="clearLocal">
+      <text class="cell-title">清理本地缓存</text>
+      <text class="cell-arrow">></text>
+    </view>
+    <view class="cell danger" bindtap="logout">
+      <text class="cell-title">退出登录</text>
+      <text class="cell-arrow">></text>
+    </view>
+  </view>
+</view>

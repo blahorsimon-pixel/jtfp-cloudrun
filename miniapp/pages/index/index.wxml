@@ -1,0 +1,59 @@
+<!--首页-->
+<view class="container">
+  <!-- 店铺页眉 -->
+  <shop-header></shop-header>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar" bindtap="goToSearch">
+    <view class="search-input">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索商品</text>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error" wx:elif="{{error}}">
+    <text class="error-text">{{error}}</text>
+    <button class="btn-retry" bindtap="loadProducts">重试</button>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="product-grid" wx:else>
+    <view
+      class="product-card"
+      wx:for="{{products}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goToProduct"
+    >
+      <image
+        class="product-image"
+        src="{{item.cover_url || '/assets/images/tab-home.png'}}"
+        mode="aspectFill"
+        lazy-load
+      />
+      <view class="product-info">
+        <text class="product-title ellipsis-2">{{item.title}}</text>
+        <view class="product-price">
+          <text class="price-symbol">¥</text>
+          <text class="price-value">{{item.price_cent / 100}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{products.length == 0}}">
+      <text>暂无商品</text>
+    </view>
+  </view>
+
+  <!-- 客服悬浮按钮 -->
+  <kefu-float></kefu-float>
+</view>

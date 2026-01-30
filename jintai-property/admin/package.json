@@ -1,0 +1,28 @@
+{
+  "name": "jintai-property-admin",
+  "version": "1.0.0",
+  "description": "金泰资产严选房源 - 管理后台",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 6001 --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --port 6001"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@types/sortablejs": "^1.15.9",
+    "axios": "^1.6.5",
+    "element-plus": "^2.5.4",
+    "pinia": "^2.1.7",
+    "sortablejs": "^1.15.6",
+    "vue": "^3.4.15",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vue-tsc": "^1.8.27"
+  }
+}

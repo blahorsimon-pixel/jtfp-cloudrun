@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>H5 商城 MVP 演示</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, 'Helvetica Neue', Arial; padding: 16px; }
+    .card { border: 1px solid #eee; padding: 12px; margin-bottom: 12px; border-radius: 8px; }
+    label { display: block; margin: 8px 0 4px; }
+    input, select, button { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { background: #07c160; color: #fff; border: none; border-radius: 6px; margin-top: 8px; }
+    .muted { color: #888; font-size: 12px; }
+    pre { background: #f8f8f8; padding: 8px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h2>H5 商城 MVP 演示页</h2>
+  <div class="card">
+    <label>API 基础地址</label>
+    <input id="apiBase" value="/api/" />
+    <div class="muted">生产示例：https://api.jintai.cloud/</div>
+  </div>
+
+  <div class="card">
+    <h3>步骤 1：拉取商品</h3>
+    <button onclick="loadProducts()">加载商品</button>
+    <div id="prods"></div>
+  </div>
+
+  <div class="card">
+    <h3>步骤 2：创建订单</h3>
+    <label>用户ID（临时）</label>
+    <input id="userId" value="10001" />
+
+    <label>商品ID</label>
+    <input id="productId" placeholder="从上方选择或输入" />
+
+    <label>数量</label>
+    <input id="qty" type="number" value="1" />
+
+    <h4>收货地址</h4>
+    <label>姓名</label>
+    <input id="name" value="张三" />
+    <label>手机</label>
+    <input id="phone" value="13800000000" />
+    <label>省市区</label>
+    <input id="region" value="广东省 深圳市 南山区" />
+    <label>详细地址</label>
+    <input id="detail" value="科技园科苑路" />
+
+    <button onclick="createOrder()">创建订单</button>
+    <div id="orderRes"></div>
+  </div>
+
+  <div class="card">
+    <h3>步骤 3：拉起微信支付</h3>
+    <label>订单号</label>
+    <input id="orderNo" />
+    <label>支付场景</label>
+    <select id="payScene">
+      <option value="JSAPI">JSAPI（微信内）</option>
+      <option value="MWEB">MWEB（微信外）</option>
+    </select>
+    <label>OpenID（JSAPI 必填，无 OAuth 暂手输）</label>
+    <input id="openid" placeholder="wx-openid" />
+    <label>MWEB 回跳 URL（微信外浏览器）</label>
+    <input id="returnUrl" value="https://h5.jintai.cloud/payresult" />
+    <button onclick="payOrder()">发起支付</button>
+    <div id="payRes"></div>
+  </div>
+
+  <script>
+  function api() { let b = document.getElementById('apiBase').value.trim(); if (!b.endsWith('/')) b += '/'; return b; }
+  function el(id){ return document.getElementById(id); }
+  function show(id, obj){ el(id).innerHTML = '<pre>'+JSON.stringify(obj, null, 2)+'</pre>'; }
+
+  async function loadProducts(){
+    const r = await fetch(api() + 'products');
+    const j = await r.json();
+    show('prods', j);
+    if (j.list && j.list.length){ el('productId').value = j.list[0].id; }
+  }
+
+  async function createOrder(){
+    const [province, city, district] = el('region').value.split(/\s+/);
+    const payload = {
+      userId: parseInt(el('userId').value, 10),
+      productId: parseInt(el('productId').value, 10),
+      qty: parseInt(el('qty').value, 10),
+      address: {
+        name: el('name').value,
+        phone: el('phone').value,
+        province, city, district,
+        detail: el('detail').value
+      }
+    };
+    const r = await fetch(api() + 'orders', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+    const j = await r.json();
+    show('orderRes', j);
+    if (j.orderNo) el('orderNo').value = j.orderNo;
+  }
+
+  function callWeixinJSBridge(params){
+    function onReady(){
+      WeixinJSBridge.invoke('getBrandWCPayRequest', {
+        appId: params.appId,
+        timeStamp: params.timeStamp,
+        nonceStr: params.nonceStr,
+        package: params.package,
+        signType: params.signType,
+        paySign: params.paySign
+      }, function(res){
+        alert('支付结果: ' + (res.err_msg || JSON.stringify(res)));
+      });
+    }
+    if (typeof WeixinJSBridge == "undefined"){
+      if( document.addEventListener ){
+        document.addEventListener('WeixinJSBridgeReady', onReady, false);
+      }else if (document.attachEvent){
+        document.attachEvent('WeixinJSBridgeReady', onReady); 
+        document.attachEvent('onWeixinJSBridgeReady', onReady);
+      }
+    } else { onReady(); }
+  }
+
+  async function payOrder(){
+    const orderNo = el('orderNo').value.trim();
+    const scene = el('payScene').value;
+    const body = { payScene: scene };
+    if (scene === 'JSAPI') body.wxOpenId = el('openid').value.trim();
+    if (scene === 'MWEB') body.returnUrl = el('returnUrl').value.trim();
+    const r = await fetch(api() + 'orders/' + orderNo + '/pay', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    show('payRes', j);
+    if (j.scene === 'JSAPI' && j.params){
+      callWeixinJSBridge(j.params);
+    } else if (j.scene === 'MWEB' && j.mweb_url){
+      window.location.href = j.mweb_url;
+    } else if (j.code === 'WXPAY_NOT_CONFIGURED'){
+      alert('未配置微信支付参数，已返回提示，可先联调下单流程。');
+    }
+  }
+  </script>
+</body>
+</html>
+

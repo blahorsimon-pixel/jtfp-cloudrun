@@ -1,0 +1,52 @@
+# 依赖目录
+node_modules
+**/node_modules
+
+# 构建输出（由 Docker 重新构建）
+dist
+**/dist
+
+# 开发文件
+.git
+.gitignore
+.vscode
+.idea
+*.log
+
+# 测试和文档
+*.md
+!README.md
+!WXCLOUD_DEPLOY.md
+test
+tests
+__tests__
+coverage
+
+# 本地配置
+.env
+.env.*
+!.env.example
+ecosystem.config.js
+
+# 敏感文件（通过环境变量注入）
+secrets
+
+# 临时文件
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# 日志
+logs
+*.log
+
+# 其他不需要的目录
+.claude
+rules
+meta-planning
+FLcode
+openapi
+sql
+scripts/*.sh
+scripts/*.py

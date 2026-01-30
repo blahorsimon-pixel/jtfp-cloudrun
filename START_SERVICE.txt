@@ -1,0 +1,61 @@
+===============================================
+房源商城服务启动指令
+===============================================
+
+请在SSH终端中依次执行以下命令：
+
+1. 进入项目目录
+-------------------
+cd /www/wwwroot/JTFP
+
+
+2. 停止旧服务
+-------------------
+pkill -f "node dist/index.js"
+lsof -ti:3100 | xargs kill -9 2>/dev/null
+sleep 2
+
+
+3. 插入测试数据（首次运行）
+-------------------
+mysql -u root h5mall < insert_test_data.sql
+
+
+4. 启动服务
+-------------------
+nohup node dist/index.js > logs/server.log 2>&1 &
+sleep 5
+
+
+5. 验证服务
+-------------------
+curl http://localhost:3100/health
+curl "http://localhost:3100/api/v1/properties/mall?pageSize=1"
+
+
+6. 访问地址
+-------------------
+后台管理: https://www.jintai.cloud/JTFP/H5/admin/
+H5商城列表: https://www.jintai.cloud/h5/#/properties
+H5商城详情: https://www.jintai.cloud/h5/#/property/1
+
+
+===============================================
+或者使用Python管理脚本（一键启动）
+===============================================
+
+python3 manage_service.py restart
+
+
+===============================================
+故障排查
+===============================================
+
+如果服务无法启动，查看日志：
+tail -50 logs/server.log
+
+如果端口被占用：
+lsof -i:3100
+kill -9 <PID>
+
+===============================================

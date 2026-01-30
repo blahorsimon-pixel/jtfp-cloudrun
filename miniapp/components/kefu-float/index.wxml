@@ -1,0 +1,16 @@
+<!-- 客服悬浮按钮 - 现代设计风格 -->
+<view class="kefu-float" bindtap="openKefu">
+  <!-- 涟漪动画层 -->
+  <view class="ripple-ring ripple-1"></view>
+  <view class="ripple-ring ripple-2"></view>
+  
+  <!-- 主按钮体 -->
+  <view class="kefu-body">
+    <!-- SVG 客服图标 -->
+    <view class="kefu-icon-svg"></view>
+    <text class="kefu-text">客服</text>
+  </view>
+  
+  <!-- 呼吸光晕 -->
+  <view class="breath-glow"></view>
+</view>

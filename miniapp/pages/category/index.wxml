@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="tabs">
+    <view class="tab {{tab == 'all' ? 'active' : ''}}" data-tab="all" bindtap="setTab">全部</view>
+    <view class="tab {{tab == 'welfare' ? 'active' : ''}}" data-tab="welfare" bindtap="setTab">福利</view>
+    <view class="tab {{tab == 'normal' ? 'active' : ''}}" data-tab="normal" bindtap="setTab">普通</view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="error" wx:elif="{{error}}">
+    <text>{{error}}</text>
+    <button class="btn-retry" bindtap="loadProducts">重试</button>
+  </view>
+
+  <view class="product-grid" wx:else>
+    <view
+      class="product-card"
+      wx:for="{{filteredProducts}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goToProduct"
+    >
+      <image class="product-image" src="{{item.cover_url}}" mode="aspectFill" />
+      <view class="product-info">
+        <view class="title-row">
+          <text class="product-title ellipsis-2">{{item.title}}</text>
+          <text class="badge" wx:if="{{item.is_welfare == 1}}">福利</text>
+        </view>
+        <view class="product-price">
+          <text class="price-symbol">¥</text>
+          <text class="price-value">{{item.price_cent / 100}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredProducts.length == 0}}">
+      <text>暂无商品</text>
+    </view>
+  </view>
+</view>

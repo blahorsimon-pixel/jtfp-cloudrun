@@ -1,0 +1,77 @@
+<view class="container">
+  <!-- 空购物车 -->
+  <view class="empty" wx:if="{{items.length == 0}}">
+    <text class="empty-icon">🛒</text>
+    <text class="empty-title">购物车还是空的</text>
+    <text class="empty-desc">快去挑选心仪的商品吧</text>
+    <view class="btn-go-home" bindtap="goHome">去逛逛</view>
+  </view>
+
+  <!-- 购物车列表 -->
+  <view class="cart-list" wx:else>
+    <view class="cart-item" wx:for="{{items}}" wx:key="key">
+      <!-- 商品图片 -->
+      <image
+        class="item-cover"
+        src="{{item.cover_url}}"
+        mode="aspectFill"
+        data-id="{{item.productId}}"
+        bindtap="goProduct"
+      />
+      
+      <!-- 商品信息 -->
+      <view class="item-info">
+        <view class="item-header">
+          <text class="item-title">{{item.title}}</text>
+          <view class="item-delete" data-key="{{item.key}}" bindtap="remove">删除</view>
+        </view>
+        
+        <text class="item-sku" wx:if="{{item.skuTitle}}">{{item.skuTitle}}</text>
+        <text class="item-sku welfare" wx:elif="{{item.is_welfare == 1}}">福利商品</text>
+        
+        <view class="item-footer">
+          <view class="item-price">
+            <text class="price-symbol">¥</text>
+            <text class="price-value">{{item.price_cent / 100}}</text>
+          </view>
+          
+          <!-- 数量选择器 - 使用 view 替代 button -->
+          <view class="qty-selector">
+            <view 
+              class="qty-btn minus {{item.qty <= 1 || item.is_welfare == 1 ? 'disabled' : ''}}" 
+              data-key="{{item.key}}" 
+              bindtap="{{item.qty > 1 && item.is_welfare != 1 ? 'dec' : ''}}"
+              catchtap="dec"
+            >
+              <text>−</text>
+            </view>
+            <view class="qty-num">{{item.qty}}</view>
+            <view 
+              class="qty-btn plus {{item.is_welfare == 1 ? 'disabled' : ''}}" 
+              data-key="{{item.key}}" 
+              catchtap="inc"
+            >
+              <text>+</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="checkout-bar" wx:if="{{items.length > 0}}">
+    <view class="checkout-info">
+      <text class="checkout-label">合计：</text>
+      <view class="checkout-total">
+        <text class="total-symbol">¥</text>
+        <text class="total-amount">{{totalCent / 100}}</text>
+      </view>
+    </view>
+    <view class="checkout-btn" bindtap="goCheckout">
+      <text>去结算</text>
+      <text class="checkout-count">({{items.length}})</text>
+    </view>
+  </view>
+
+</view>

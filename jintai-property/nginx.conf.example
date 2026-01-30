@@ -1,0 +1,89 @@
+# 金泰资产严选房源系统 - Nginx配置示例
+# 请将以下配置添加到现有的 HTTPS server 块中
+
+# 假设您的现有配置位于 /etc/nginx/sites-available/www.jintai.cloud
+
+# 后端API服务 (端口6000)
+location /JTFP/api/ {
+    proxy_pass http://127.0.0.1:6000/api/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_cache_bypass $http_upgrade;
+    proxy_connect_timeout 300s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+}
+
+# WEB管理后台 (端口6001)
+location /JTFP/admin/ {
+    alias /www/wwwroot/JTFP/jintai-property/admin/dist/;
+    try_files $uri $uri/ /JTFP/admin/index.html;
+    index index.html;
+    
+    # 禁用缓存，确保管理后台总是最新版本
+    add_header Cache-Control "no-store, no-cache, must-revalidate, max-age=0";
+    add_header Pragma "no-cache";
+    add_header Expires "0";
+}
+
+# 管理后台静态资源（允许缓存）
+location ~* ^/JTFP/admin/assets/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    alias /www/wwwroot/JTFP/jintai-property/admin/dist/;
+    expires 7d;
+    add_header Cache-Control "public, immutable";
+}
+
+# H5商城前端 (端口6002)
+location /JTFP/h5/ {
+    alias /www/wwwroot/JTFP/jintai-property/h5/dist/;
+    try_files $uri $uri/ /JTFP/h5/index.html;
+    index index.html;
+    
+    # H5页面适度缓存
+    add_header Cache-Control "public, max-age=3600";
+}
+
+# H5商城静态资源（允许缓存）
+location ~* ^/JTFP/h5/assets/.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    alias /www/wwwroot/JTFP/jintai-property/h5/dist/;
+    expires 7d;
+    add_header Cache-Control "public, immutable";
+}
+
+# ============================================
+# 完整配置示例（参考）
+# ============================================
+
+# server {
+#     listen 443 ssl http2;
+#     server_name www.jintai.cloud;
+# 
+#     ssl_certificate /path/to/your/certificate.crt;
+#     ssl_certificate_key /path/to/your/private.key;
+# 
+#     # ... 其他SSL配置 ...
+# 
+#     # 将上述 location 块添加到这里
+#     location /JTFP/api/ { ... }
+#     location /JTFP/admin/ { ... }
+#     location /JTFP/h5/ { ... }
+# 
+#     # ... 其他现有配置 ...
+# }
+
+# ============================================
+# 重载Nginx配置
+# ============================================
+# 1. 测试配置是否正确：
+#    nginx -t
+# 
+# 2. 重载配置（不中断服务）：
+#    nginx -s reload
+#
+# 或使用 systemctl：
+#    systemctl reload nginx

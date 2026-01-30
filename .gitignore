@@ -1,0 +1,35 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+coverage/
+.tmp/
+.idea/
+.vscode/
+
+# 构建产物
+jintai-property/*/dist/
+public/admin/
+public/h5/
+
+# 敏感文件（绝对不要提交）
+secrets/
+*.pem
+*.key
+
+# PM2 配置（包含敏感信息）
+ecosystem.config.js
+
+# WeChat Mini Program CI private keys (DO NOT COMMIT)
+secrets/wechat/mini/*.key
+
+# 日志
+logs/
+*.log
+
+# 本地开发
+.claude/
+terminals/

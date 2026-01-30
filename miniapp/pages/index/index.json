@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "携荷管家商城",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "shop-header": "/components/shop-header/index"
+  }
+}
