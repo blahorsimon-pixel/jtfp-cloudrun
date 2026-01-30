@@ -1,24 +1,19 @@
 # 微信云托管 Dockerfile - Express.js + Vue 3 前端
-# 参考官方模板: WeixinCloud/wxcloudrun-express
+# 使用 Node.js 18 官方镜像
 
-# 使用 Alpine 基础镜像（与官方模板一致）
-FROM alpine:3.13
+FROM node:18-alpine
 
 # 设置时区为上海
-RUN apk add tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
-
-# HTTPS 证书
-RUN apk add ca-certificates
-
-# 安装 Node.js 和 npm（使用国内镜像）
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tencent.com/g' /etc/apk/repositories \
-    && apk add --update --no-cache nodejs npm
+RUN apk add --no-cache tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
 
 # 指定工作目录
 WORKDIR /app
 
 # 使用国内 npm 镜像
-RUN npm config set registry https://mirrors.cloud.tencent.com/npm/
+RUN npm config set registry https://registry.npmmirror.com/
+
+# ============ 复制静态资源（先复制，避免被覆盖） ============
+COPY public ./public
 
 # ============ 安装后端依赖并构建 ============
 COPY package*.json ./
@@ -46,9 +41,6 @@ RUN mkdir -p public/admin public/h5 \
     && cp -r jintai-property/admin/dist/* public/admin/ \
     && cp -r jintai-property/h5/dist/* public/h5/
 
-# 复制静态资源
-COPY public ./public
-
 # 清理不需要的文件，减小镜像体积
 RUN rm -rf jintai-property/*/node_modules \
     && rm -rf jintai-property/*/src \
@@ -59,5 +51,5 @@ RUN rm -rf jintai-property/*/node_modules \
 ENV NODE_ENV=production
 ENV PORT=80
 
-# 启动命令（与官方模板一致，使用 npm start）
+# 启动命令
 CMD ["npm", "start"]
