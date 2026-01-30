@@ -36,9 +36,9 @@ export const config = {
   db: {
     host: dbAddr.host,
     port: dbAddr.port,
-    user: process.env.MYSQL_USERNAME || required('DB_USER'),
-    password: process.env.MYSQL_PASSWORD || required('DB_PASSWORD'),
-    database: required('DB_NAME', 'h5mall'),
+    user: process.env.MYSQL_USERNAME || process.env.DB_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'jtfp_property',
   },
   redisUrl: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
   jwtSecret: process.env.JWT_SECRET ?? 'change_me',

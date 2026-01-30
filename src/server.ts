@@ -49,6 +49,32 @@ app.use(pinoHttp());
 app.get('/health', (_req, res) => res.json({ ok: true, env: config.env }));
 app.get('/h5/api/health', (_req, res) => res.json({ ok: true, env: config.env, prefix: '/h5/api' }));
 
+// 数据库连接诊断端点
+app.get('/debug/db', async (_req, res) => {
+  const dbConfig = {
+    host: process.env.MYSQL_ADDRESS?.split(':')[0] || process.env.DB_HOST || 'not set',
+    port: process.env.MYSQL_ADDRESS?.split(':')[1] || process.env.DB_PORT || 'not set',
+    user: process.env.MYSQL_USERNAME || process.env.DB_USER || 'not set',
+    database: process.env.DB_NAME || 'not set',
+    hasPassword: !!(process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD),
+    MYSQL_ADDRESS: process.env.MYSQL_ADDRESS || 'not set',
+  };
+  
+  try {
+    const { pool } = await import('./db/mysql');
+    const [rows] = await pool.query('SELECT 1 as test');
+    res.json({ ok: true, config: dbConfig, queryResult: rows });
+  } catch (e: any) {
+    res.status(500).json({ 
+      ok: false, 
+      error: e.message, 
+      code: e.code,
+      errno: e.errno,
+      config: dbConfig
+    });
+  }
+});
+
 app.use('/shipping', shippingRouter);
 app.use('/redeem', redeemRouter);
 // app.use('/payments', paymentRouter);
