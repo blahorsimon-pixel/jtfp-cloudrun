@@ -49,6 +49,16 @@ app.use(pinoHttp());
 app.get('/health', (_req, res) => res.json({ ok: true, env: config.env }));
 app.get('/h5/api/health', (_req, res) => res.json({ ok: true, env: config.env, prefix: '/h5/api' }));
 
+// 配置诊断端点
+app.get('/debug/config', (_req, res) => {
+  res.json({
+    env: config.env,
+    hasAdminToken: !!config.adminToken,
+    adminTokenLength: config.adminToken?.length || 0,
+    ADMIN_TOKEN_ENV: process.env.ADMIN_TOKEN ? 'set' : 'not set',
+  });
+});
+
 // 数据库连接诊断端点
 app.get('/debug/db', async (_req, res) => {
   const dbConfig = {
