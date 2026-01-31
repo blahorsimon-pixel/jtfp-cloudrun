@@ -399,10 +399,9 @@ const normalizeImageUrl = (url: string): string => {
     return url
   }
   
-  // 对于所有相对路径，拼接后端服务器地址
-  // 后端服务器已配置 /JTFP/h5/images/uploads/ 的静态文件服务
-  const path = url.startsWith('/') ? url : `/${url}`
-  return `http://localhost:6200${path}`
+  // 对于相对路径，直接返回（浏览器会从当前域名加载）
+  // 后端已配置静态文件服务：/h5/images/uploads 和 /JTFP/h5/images/uploads
+  return url.startsWith('/') ? url : `/${url}`
 }
 
 // 获取所有图片
