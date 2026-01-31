@@ -1,10 +1,10 @@
 import http from 'http';
 import { app } from './server';
 import { config } from './config/index';
+import { currentDriver, useFileStore, initStorage } from './storage';
 
 /**
- * 数据库字段定义映射
- * 用于自动修复缺失的字段
+ * 数据库字段定义映射（仅 MySQL 模式使用）
  */
 const FIELD_DEFINITIONS: Record<string, string> = {
   holding_years: "VARCHAR(50) COMMENT '持有年数'",
@@ -21,28 +21,31 @@ const FIELD_DEFINITIONS: Record<string, string> = {
 };
 
 /**
- * 检查数据库表结构是否完整
- * 用于在启动时诊断可能的数据库迁移问题
- * 
- * 在云托管环境下，如果检测到字段缺失，会自动执行修复
+ * 检查数据库表结构是否完整（仅 MySQL 模式）
  */
 async function checkDatabaseSchema(): Promise<void> {
+  // FileStore 模式：跳过 MySQL 检查
+  if (useFileStore) {
+    console.log('[Storage] FileStore 模式，跳过 MySQL schema 检查');
+    return;
+  }
+
+  // MySQL 模式：执行原有的 schema 检查
   try {
     const { pool } = await import('./db/mysql');
     
-    // 必需字段列表（如果缺失会导致写入失败）
     const requiredFields = [
-      'holding_years',      // 基础房源字段
-      'price_cent',         // 商城字段
-      'cover_url',          // 商城字段
-      'description',        // 商城字段
-      'status',             // 商城字段
-      'is_featured',        // 商城字段
-      'sort_order',         // 商城字段
-      'stock',              // 商城字段
-      'images',             // 商城字段
-      'module_config',      // 扩展字段
-      'category_id',        // 扩展字段
+      'holding_years',
+      'price_cent',
+      'cover_url',
+      'description',
+      'status',
+      'is_featured',
+      'sort_order',
+      'stock',
+      'images',
+      'module_config',
+      'category_id',
     ];
 
     const [columns] = await pool.query<any[]>(
@@ -60,7 +63,6 @@ async function checkDatabaseSchema(): Promise<void> {
       console.warn('⚠️  检测到 properties 表缺失以下字段：');
       missingFields.forEach(field => console.warn(`   - ${field}`));
       
-      // 仅在云托管环境自动修复
       if (config.isWxCloudRun) {
         console.log('🔧 云托管环境：自动修复缺失字段...');
         
@@ -76,7 +78,6 @@ async function checkDatabaseSchema(): Promise<void> {
               continue;
             }
             
-            // 使用 IF NOT EXISTS 确保幂等性（MySQL 5.7.6+ 支持）
             await pool.query(
               `ALTER TABLE properties ADD COLUMN IF NOT EXISTS \`${field}\` ${definition}`
             );
@@ -93,40 +94,50 @@ async function checkDatabaseSchema(): Promise<void> {
           console.log(`✓ 字段修复完成！成功添加 ${successCount} 个字段`);
         } else {
           console.warn(`⚠️  字段修复部分失败：成功 ${successCount} 个，失败 ${failCount} 个`);
-          console.warn('⚠️  请检查数据库权限或手动执行修复脚本：');
-          console.warn('   sql/fix_missing_fields_simple.sql');
         }
       } else {
-        // 本地环境：只警告，不自动修复
         console.warn('⚠️  这可能导致房源保存和批量导入失败！');
         console.warn('⚠️  请运行数据库迁移脚本修复：');
         console.warn('   npm run migrate:diagnose  # 诊断问题');
         console.warn('   npm run migrate:fix       # 执行修复');
-        console.warn('');
       }
     } else {
       console.log('✓ 数据库表结构检查通过');
     }
   } catch (error: any) {
     console.warn('⚠️  数据库表结构检查失败:', error.message);
-    console.warn('   如果是首次启动，请先执行数据库初始化脚本');
   }
 }
 
 const server = http.createServer(app);
 
-// 在服务器启动前检查数据库表结构
-checkDatabaseSchema().then(() => {
+// 启动流程
+async function start() {
+  console.log('========================================');
+  console.log(`存储驱动: ${currentDriver}`);
+  console.log(`环境: ${config.env}`);
+  console.log(`端口: ${config.port}`);
+  console.log('========================================');
+
+  // 初始化存储
+  if (useFileStore) {
+    initStorage();
+    console.log('✓ FileStore 初始化完成');
+  } else {
+    await checkDatabaseSchema();
+  }
+
+  // 启动服务器
   server.listen(config.port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`H5 Mall server listening on http://0.0.0.0:${config.port}`);
-    // PM2 cluster 模式：通知 ready 后才开始接流量（零停机 reload）
+    console.log(`✓ H5 Mall server listening on http://0.0.0.0:${config.port}`);
+    // PM2 cluster 模式：通知 ready 后才开始接流量
     if (typeof process.send === 'function') {
       process.send('ready');
     }
   });
-}).catch((error) => {
+}
+
+start().catch((error) => {
   console.error('启动失败:', error);
   process.exit(1);
 });
-

@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { pool } from '../../../db/mysql';
 import { requireAdminToken } from '../../../middlewares/admin_auth';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
+import { storage } from '../../../storage';
 
 const router = Router();
 
@@ -13,10 +12,8 @@ router.use(requireAdminToken);
  */
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM categories ORDER BY sort_order DESC, id ASC'
-    );
-    res.json({ categories: rows });
+    const categories = storage.categories.list();
+    res.json({ categories });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -32,14 +29,16 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: '分类名称不能为空' });
     }
 
-    const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO categories (name, icon, sort_order, status) VALUES (?, ?, ?, ?)',
-      [name, icon || null, sort_order || 0, status ?? 1]
-    );
+    const category = storage.categories.create({
+      name,
+      icon: icon || undefined,
+      sort_order: sort_order || 0,
+      status: status ?? 1,
+    });
 
     res.json({
       success: true,
-      id: result.insertId,
+      id: category.id,
       message: '分类创建成功'
     });
   } catch (err: any) {
@@ -55,18 +54,17 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { name, icon, sort_order, status } = req.body;
 
-    const [existing] = await pool.query<RowDataPacket[]>(
-      'SELECT id FROM categories WHERE id = ?',
-      [id]
-    );
-    if (!existing.length) {
+    const existing = storage.categories.findById(Number(id));
+    if (!existing) {
       return res.status(404).json({ error: '分类不存在' });
     }
 
-    await pool.query(
-      'UPDATE categories SET name = ?, icon = ?, sort_order = ?, status = ? WHERE id = ?',
-      [name, icon || null, sort_order || 0, status ?? 1, id]
-    );
+    storage.categories.update(Number(id), {
+      name,
+      icon: icon || null,
+      sort_order: sort_order || 0,
+      status: status ?? 1,
+    });
 
     res.json({ success: true, message: '分类更新成功' });
   } catch (err: any) {
@@ -82,15 +80,11 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 
     // 检查是否有房源关联了此分类
-    const [properties] = await pool.query<RowDataPacket[]>(
-      'SELECT id FROM properties WHERE category_id = ? LIMIT 1',
-      [id]
-    );
-    if (properties.length > 0) {
+    if (storage.properties.existsByCategoryId(Number(id))) {
       return res.status(400).json({ error: '该分类下已有房源，无法删除' });
     }
 
-    await pool.query('DELETE FROM categories WHERE id = ?', [id]);
+    storage.categories.remove(Number(id));
     res.json({ success: true, message: '分类删除成功' });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

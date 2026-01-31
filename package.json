@@ -8,7 +8,10 @@
     "start": "NODE_ENV=production node dist/index.js",
     "miniapp:upload": "node scripts/miniapp-upload.js",
     "lint": "echo 'TODO: add eslint'",
-    "schema:apply": "mysql --default-character-set=utf8mb4 -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME < db/schema.sql"
+    "schema:apply": "mysql --default-character-set=utf8mb4 -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME < db/schema.sql",
+    "migrate:test": "ts-node scripts/migrate_production_db.ts test",
+    "migrate:diagnose": "ts-node scripts/migrate_production_db.ts diagnose",
+    "migrate:fix": "ts-node scripts/migrate_production_db.ts fix"
   },
   "dependencies": {
     "axios": "^1.7.7",

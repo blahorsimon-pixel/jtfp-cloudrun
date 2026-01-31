@@ -1,20 +1,45 @@
 import { Router } from 'express';
-import { pool } from '../db/mysql';
+import { storage } from '../storage';
 
 const router = Router();
 
-router.get('/', async (_req, res, next) => {
+// 获取商品评论列表
+router.get('/', async (req, res, next) => {
   try {
-    // For now, we fetch all reviews. We can add pagination later.
-    const [reviews] = await pool.query(
-      `SELECT r.id, r.user_name, r.user_avatar, r.rating, r.content, r.created_at, p.title as product_title, p.cover_url as product_cover
-       FROM product_reviews r
-       JOIN products p ON r.product_id = p.id
-       WHERE r.status = 1
-       ORDER BY r.created_at DESC
-       LIMIT 50`
-    );
-    res.json({ list: reviews });
+    const productId = parseInt(req.query.productId as string || '0', 10);
+    const page = Math.max(parseInt(req.query.page as string || '1', 10), 1);
+    const pageSize = Math.min(parseInt(req.query.pageSize as string || '20', 10), 100);
+
+    const result = storage.reviews.list({
+      productId: productId > 0 ? productId : undefined,
+      status: 1,
+      page,
+      pageSize,
+    });
+
+    return res.json({
+      total: result.total,
+      page,
+      pageSize,
+      reviews: result.reviews,
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+// 获取商品评分统计
+router.get('/stats/:productId', async (req, res, next) => {
+  try {
+    const productId = parseInt(req.params.productId, 10);
+
+    const avgRating = storage.reviews.getAverageRating(productId);
+    const count = storage.reviews.getReviewCount(productId);
+
+    return res.json({
+      average_rating: avgRating,
+      review_count: count,
+    });
   } catch (e) {
     next(e);
   }
